@@ -1,0 +1,971 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IT Developments Monitor — Dr. Vincent Z.W. Mack</title>
+<meta name="description" content="A daily, sourced monitor of developments in computing, information systems and data science, maintained by Dr. Vincent Z.W. Mack.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --surface-0: #f4f3f0;
+  --surface-1: #fcfcfb;
+  --surface-2: #f0efec;
+  --border: #e2e1dc;
+  --grid: #e8e7e3;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #7a7974;
+  --link: #1c5cab;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-1-soft: #b7d3f6;
+  --band: #f0efec;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --surface-0: #121211;
+    --surface-1: #1a1a19;
+    --surface-2: #232321;
+    --border: #33332f;
+    --grid: #2b2b28;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #8f8e86;
+    --link: #86b6ef;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-1-soft: #184f95;
+    --band: #232321;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-0: #121211; --surface-1: #1a1a19; --surface-2: #232321; --border: #33332f; --grid: #2b2b28;
+  --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #8f8e86; --link: #86b6ef;
+  --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-1-soft: #184f95; --band: #232321;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--surface-0); color: var(--text-primary);
+  font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button, input, select { font: inherit; color: inherit; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+header.top {
+  position: sticky; top: 0; z-index: 10; background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
+}
+header.top .wrap { display: flex; align-items: baseline; gap: 28px; height: 52px; }
+header.top h1 { font-size: 16px; margin: 0; font-weight: 650; letter-spacing: .01em; white-space: nowrap; }
+nav.main { display: flex; gap: 20px; }
+nav.main a { color: var(--text-secondary); padding: 15px 0 13px; border-bottom: 2px solid transparent; }
+nav.main a.on { color: var(--text-primary); border-bottom-color: var(--text-primary); text-decoration: none; }
+header.top .gen { margin-left: auto; color: var(--text-muted); font-size: 12px; white-space: nowrap; }
+main { padding: 24px 0 80px; }
+h2 { font-size: 24px; line-height: 1.25; margin: 0 0 4px; font-weight: 650; }
+h3 { font-size: 17px; margin: 28px 0 10px; font-weight: 650; }
+.sub { color: var(--text-secondary); margin: 0 0 18px; }
+.muted { color: var(--text-muted); }
+.small { font-size: 13px; }
+.note {
+  border-left: 3px solid var(--border); padding: 6px 12px; color: var(--text-secondary);
+  background: var(--surface-1); margin: 12px 0; font-size: 14px;
+}
+.panel { background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.btn {
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: 6px;
+  padding: 5px 11px; cursor: pointer; color: var(--text-primary);
+}
+.btn:hover { background: var(--surface-2); }
+.btn[disabled] { opacity: .4; cursor: default; }
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.seg button { border: 0; background: var(--surface-1); padding: 5px 11px; cursor: pointer; color: var(--text-secondary); }
+.seg button + button { border-left: 1px solid var(--border); }
+.seg button.on { background: var(--surface-2); color: var(--text-primary); font-weight: 600; }
+input[type=search], input[type=date], select {
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: 6px; padding: 5px 9px;
+}
+input[type=search] { min-width: 220px; }
+select { max-width: 230px; }
+.filters { position: sticky; top: 52px; z-index: 5; background: var(--surface-0); padding: 12px 0; margin-bottom: 4px; }
+
+/* day view */
+.daygrid { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 32px; }
+@media (max-width: 900px) {
+  .daygrid { grid-template-columns: 1fr; }
+  .side { border-top: 1px solid var(--border); padding-top: 8px; }
+}
+@media (max-width: 640px) {
+  header.top .wrap { gap: 16px; }
+  header.top .gen { display: none; }
+  nav.main { gap: 14px; }
+  .filters { position: static; }
+  .filters .seg { overflow-x: auto; max-width: 100%; }
+  input[type=search] { min-width: 0; width: 100%; }
+  select { max-width: 100%; flex: 1 1 140px; }
+  .arch-row { grid-template-columns: 110px 1fr 44px; }
+  .arch-row > span:last-child { grid-column: 2 / -1; }
+}
+.story { padding: 16px 0; border-bottom: 1px solid var(--border); }
+.story:first-child { padding-top: 4px; }
+.story .t { font-size: 16.5px; font-weight: 600; line-height: 1.35; color: var(--text-primary); }
+.story .t:hover { color: var(--link); }
+.story .meta { color: var(--text-muted); font-size: 13px; margin-top: 3px; }
+.story .sum { color: var(--text-secondary); margin: 6px 0 0; font-size: 14.5px; }
+.story .sum.clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
+.story .tags { font-size: 13px; margin-top: 6px; color: var(--text-muted); }
+.story .tags a { color: var(--text-secondary); }
+.story .tags a:hover { color: var(--link); }
+.side h3 { margin-top: 4px; }
+.side ol { list-style: none; padding: 0; margin: 0; }
+.side li { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; font-size: 14px; }
+.side li a.sel { font-weight: 650; }
+.side li .n { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+details.brief { margin: 4px 0 20px; padding: 6px 18px 12px; }
+details.month { border-bottom: 1px solid var(--border); }
+details.month > summary { cursor: pointer; padding: 12px 0; font-weight: 600; display: flex; gap: 10px; align-items: baseline; }
+details.month > summary .muted { font-weight: 400; font-size: 13.5px; }
+details.month[open] > summary { border-bottom: 1px solid var(--border); }
+details.month .story { padding: 10px 0; }
+details.month .story .t { font-size: 15px; }
+.ehead { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 4px 0 6px; }
+.ehead label { font-size: 14px; color: var(--text-secondary); display: inline-flex; gap: 6px; align-items: center; }
+.reports-list { margin: 0 0 8px; padding-left: 18px; }
+.reports-list li { margin: 3px 0; }
+details.brief > summary { cursor: pointer; font-weight: 600; padding: 6px 0; color: var(--text-secondary); }
+.more { margin: 18px 0; }
+
+/* markdown */
+.md { max-width: 760px; }
+.md h1 { font-size: 22px; margin: 10px 0 12px; }
+.md h2 { font-size: 18px; margin: 22px 0 8px; }
+.md h3 { font-size: 16px; margin: 18px 0 6px; }
+.md p { margin: 0 0 12px; }
+.md ul, .md ol { padding-left: 22px; margin: 0 0 12px; }
+.md li { margin: 3px 0; }
+.md table { border-collapse: collapse; margin: 6px 0 16px; font-size: 14px; }
+.md th, .md td { border-bottom: 1px solid var(--border); padding: 4px 10px 4px 0; text-align: left; vertical-align: top; }
+.md td.num, .md th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.md blockquote { margin: 8px 0 14px; border-left: 3px solid var(--border); padding: 2px 12px; color: var(--text-secondary); }
+.md code { background: var(--surface-2); padding: 1px 4px; border-radius: 3px; font-size: 13px; }
+.md pre { background: var(--surface-2); padding: 10px; border-radius: 6px; overflow-x: auto; }
+.md .fm { color: var(--text-muted); font-size: 13px; margin-bottom: 6px; }
+
+/* archive */
+.arch-month { margin-bottom: 26px; }
+.arch-row { display: grid; grid-template-columns: 150px 1fr 70px 150px; gap: 12px; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--grid); font-size: 14px; }
+.arch-row .bar { height: 8px; background: var(--series-1); border-radius: 0 4px 4px 0; min-width: 2px; }
+.arch-row .bar.partial { background: var(--series-1-soft); }
+.arch-row .n { text-align: right; font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+.reports-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+@media (max-width: 800px) { .reports-cols { grid-template-columns: 1fr; } }
+.reports-cols ul { list-style: none; padding: 0; margin: 0; }
+.reports-cols li { padding: 3px 0; font-size: 14px; }
+
+/* trends */
+table.ents { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.ents th { text-align: left; font-weight: 600; color: var(--text-secondary); padding: 6px 8px; border-bottom: 1px solid var(--border); cursor: pointer; white-space: nowrap; user-select: none; }
+table.ents th.num, table.ents td.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.ents td { padding: 5px 8px; border-bottom: 1px solid var(--grid); }
+table.ents tr:hover td { background: var(--surface-2); }
+table.ents th .arr { color: var(--text-muted); font-size: 11px; }
+.spark { display: block; }
+.multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.mult { padding: 10px 12px 6px; }
+.mult .h { font-size: 13px; font-weight: 600; line-height: 1.3; min-height: 34px; }
+.mult .h .muted { font-weight: 400; }
+.chart { position: relative; }
+.chart svg { display: block; overflow: visible; }
+.tip {
+  position: absolute; pointer-events: none; background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 6px; padding: 6px 9px; font-size: 12.5px; line-height: 1.4; box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  white-space: nowrap; display: none; z-index: 4;
+}
+.tip b { font-weight: 650; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--text-secondary); margin: 6px 0; }
+.legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+.compare-box { padding: 14px 16px; margin-bottom: 18px; }
+.chk { width: 15px; height: 15px; vertical-align: middle; }
+.viewtoggle { font-size: 13px; }
+.pub-only { display: none; }
+body.public .pub-only { display: inline; }
+footer.pubnote { color: var(--text-muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 40px; padding-top: 14px; }
+/* ---- public theme: vincentmack.com tokens (styles.css), light only ---- */
+:root, :root[data-theme="dark"] {
+  color-scheme: light;
+  --navy: #0f2344; --navy-mid: #1a3a6e; --accent: #2563eb;
+  --nyp-blue: #0b3f8f; --nyp-red: #d2202e;
+  --surface-0: #f8fafc; --surface-1: #ffffff; --surface-2: #f1f5f9;
+  --border: #e2e8f0; --grid: #eef2f7; --band: #f1f5f9;
+  --text-primary: #1e293b; --text-secondary: #475569; --text-muted: #64748b;
+  --link: #2563eb;
+  --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; --series-1-soft: #b7d3f6;
+  --px: clamp(16px, 4vw, 32px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: light;
+    --surface-0: #f8fafc; --surface-1: #ffffff; --surface-2: #f1f5f9;
+    --border: #e2e8f0; --grid: #eef2f7; --band: #f1f5f9;
+    --text-primary: #1e293b; --text-secondary: #475569; --text-muted: #64748b; --link: #2563eb;
+    --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; --series-1-soft: #b7d3f6;
+  }
+}
+body.public { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--surface-0); }
+body.public h2, body.public .md h1 { font-family: 'Lora', serif; font-weight: 600; letter-spacing: -.01em; }
+.wrap { padding: 0 var(--px); }
+header.pub {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 55%, var(--nyp-blue) 100%);
+  color: #fff; padding: clamp(26px, 5vw, 46px) 0 clamp(22px, 4vw, 38px);
+  position: relative; overflow: hidden; border-bottom: 4px solid var(--nyp-red);
+}
+#net-canvas { position: absolute; inset: 0; opacity: .55; pointer-events: none; width: 100%; height: 100%; }
+.hdr { position: relative; max-width: 1180px; margin: 0 auto; padding: 0 var(--px); }
+.hdr-name { font-family: 'Lora', serif; font-size: clamp(22px, 4.4vw, 34px); font-weight: 600; letter-spacing: -.02em; line-height: 1.2; margin-bottom: 8px; }
+.hdr-name::after { content: ""; display: block; width: 52px; height: 3px; border-radius: 2px; background: var(--nyp-red); margin: 10px 0 0; }
+.hdr-title { font-size: clamp(12px, 2vw, 14px); color: #93c5fd; margin-bottom: 2px; }
+.hdr-inst { font-size: clamp(11px, 1.8vw, 13px); color: #bfdbfe; }
+.hdr-inst a { color: #e0f2fe; text-decoration: underline; text-decoration-color: rgba(224,242,254,.4); }
+.nav-bar { background: var(--surface-1); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.nav-inner { max-width: 1180px; margin: 0 auto; padding: 0 var(--px); display: flex; overflow-x: auto; scrollbar-width: none; }
+.nav-inner::-webkit-scrollbar { display: none; }
+.nav-tab { flex-shrink: 0; display: inline-flex; align-items: center; padding: 0 18px; min-height: 48px; font-size: clamp(13px, 2vw, 14px); font-weight: 500; color: var(--text-muted); text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.nav-tab:hover { color: var(--accent); text-decoration: none; }
+.nav-tab.active { color: var(--nyp-blue); border-bottom-color: var(--nyp-red); }
+.subnav { background: var(--surface-0); border-bottom: 1px solid var(--border); }
+.subnav .wrap { display: flex; align-items: baseline; gap: 24px; min-height: 44px; }
+.subnav nav.main { display: flex; gap: 20px; }
+.subnav nav.main a { color: var(--text-secondary); padding: 11px 0 9px; border-bottom: 2px solid transparent; font-size: 14px; font-weight: 500; }
+.subnav nav.main a.on { color: var(--nyp-blue); border-bottom-color: var(--accent); text-decoration: none; }
+.subnav .gen { margin-left: auto; color: var(--text-muted); font-size: 12px; white-space: nowrap; }
+.filters { top: 48px; }
+body.public .md .fm { display: none; }
+@media (max-width: 640px) { .subnav .gen { display: none; } .subnav nav.main { gap: 14px; overflow-x: auto; } }
+</style>
+</head>
+<body class="public">
+<header class="pub">
+  <canvas id="net-canvas" aria-hidden="true"></canvas>
+  <div class="hdr">
+    <div class="hdr-name">IT Developments Monitor</div>
+    <div class="hdr-title">A daily, sourced scan of computing, information systems and data science</div>
+    <div class="hdr-inst">Maintained by <a href="https://vincentmack.com/">Dr. Vincent Z.W. Mack</a>, School of Information Technology, Nanyang Polytechnic</div>
+  </div>
+</header>
+<div class="nav-bar"><div class="nav-inner" aria-label="Site sections">
+  <a class="nav-tab" href="https://vincentmack.com/index.html">Research</a>
+  <a class="nav-tab" href="https://vincentmack.com/publications.html">Publications</a>
+  <a class="nav-tab" href="https://vincentmack.com/visualizations.html">Visualizations</a>
+  <a class="nav-tab" href="https://vincentmack.com/teaching.html">Teaching</a>
+  <a class="nav-tab" href="https://vincentmack.com/experience.html">Experience</a>
+  <a class="nav-tab" href="https://vincentmack.com/cv.html">CV</a>
+  <a class="nav-tab active" href="./" aria-current="page">IT Scan</a>
+</div></div>
+<div class="subnav"><div class="wrap">
+  <nav class="main" aria-label="IT scan views">
+    <a href="#day" data-nav="day">Stories</a>
+    <a href="#archive" data-nav="archive">Archive</a>
+    <a href="#trends" data-nav="trends">Trends</a>
+    <a href="#reports" data-nav="reports">Reports</a>
+    <a href="#about" data-nav="about">About</a>
+  </nav>
+  <span class="gen" id="gen"></span>
+</div></div>
+<main><div class="wrap" id="app"><p class="muted">Loading…</p></div></main>
+
+<script>
+"use strict";
+/* ------------------------------------------------------------------ data loading */
+const ITSCAN = {
+  pending: {}, cache: {},
+  loaded(kind, key, payload) {
+    const id = kind + ":" + key;
+    this.cache[id] = payload;
+    (this.pending[id] || []).forEach(r => r(payload));
+    delete this.pending[id];
+  },
+  load(kind, key, src) {
+    const id = kind + ":" + key;
+    if (this.cache[id]) return Promise.resolve(this.cache[id]);
+    return new Promise((resolve, reject) => {
+      const first = !this.pending[id];
+      (this.pending[id] = this.pending[id] || []).push(resolve);
+      if (!first) return;
+      const s = document.createElement("script");
+      s.src = src + "?v=" + (window.__v || "");
+      s.onerror = () => { delete this.pending[id]; reject(new Error("missing " + src)); };
+      document.head.appendChild(s);
+    });
+  }
+};
+window.ITSCAN = ITSCAN;
+const loadIndex = () => ITSCAN.load("index", null, "data/index.js");
+const loadDay = d => ITSCAN.load("day", d, "data/days/" + d + ".js");
+const loadReport = r => ITSCAN.load("report", r, "data/reports/" + r + ".js");
+const loadEntity = id => ITSCAN.load("entity", id, "data/entities/" + id + ".js");
+
+/* ------------------------------------------------------------------ helpers */
+const $ = (sel, el = document) => el.querySelector(sel);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const prevDay = d => { const x = new Date(d + "T12:00:00Z"); x.setUTCDate(x.getUTCDate() - 1); return x.toISOString().slice(0, 10); };
+const fmtDate = d => new Date(d + "T12:00:00").toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "long", year: "numeric"});
+const fmtShort = d => new Date(d + "T12:00:00").toLocaleDateString("en-GB", {day: "numeric", month: "short"});
+const TYPE1 = {organisations: "organisation", technologies: "technology", techniques: "technique", standards: "standard"};
+const TYPES = {organisations: "Organisations", technologies: "Technologies", techniques: "Techniques", standards: "Standards"};
+const TIERS = {academic: "Academic", vendor: "Vendor and project", news: "News and community", standards: "Reports and standards"};
+let IDX = null, ENT = {};
+const PUBLIC = () => !!(IDX && IDX.public);
+const reportExists = (kind, name) => ((IDX.reports || {})[kind] || []).some(r => r.name === name);
+const pubNote = () => PUBLIC() ? `<footer class="pubnote">${esc(IDX.public_note || "")} <a href="#about">How this is made</a>.</footer>` : "";
+
+function parseHash() {
+  const h = decodeURIComponent(location.hash.slice(1));
+  const [view, ...rest] = h.split("=");
+  return {view: view || "day", arg: rest.join("=") || null};
+}
+function setNav(view) {
+  document.querySelectorAll("nav.main a").forEach(a =>
+    a.classList.toggle("on", a.dataset.nav === (view === "entity" ? "trends" : view === "report" ? "reports" : view)));
+}
+
+/* ------------------------------------------------------------------ markdown */
+function inline(s, base) {
+  s = esc(s);
+  s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+  s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m, text, url) => {
+    const href = rewriteLink(url.replace(/&amp;/g, "&"), base);
+    if (href == null) return text;
+    const ext = /^https?:/.test(href);
+    return `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${text}</a>`;
+  });
+  s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  s = s.replace(/(^|[^\w*])_([^_]+)_(?=[^\w]|$)/g, "$1<em>$2</em>");
+  s = s.replace(/(^|[^\w*])\*([^*]+)\*(?=[^\w*]|$)/g, "$1<em>$2</em>");
+  return s;
+}
+function rewriteLink(url, base) {
+  if (/^[a-z]+:/i.test(url) || url.startsWith("#")) return url;
+  const parts = (base + url).split("/");
+  const out = [];
+  for (const p of parts) { if (p === "..") out.pop(); else if (p !== ".") out.push(p); }
+  const path = out.join("/");
+  let m = path.match(/^wiki\/entities\/([a-z]+\/[^/]+)\/index\.md$/);
+  if (m) return "#entity=" + m[1];
+  m = path.match(/^reports\/(daily|weekly|monthly)\/([^/]+)\.md$/);
+  if (m && (!PUBLIC() || reportExists(m[1], m[2]))) return "#report=" + m[1] + "/" + m[2];
+  if (PUBLIC()) return null;            // local wiki or data files are not published
+  return "../" + path;
+}
+function md(text, base) {
+  let fm = "";
+  text = text.replace(/^---\n([\s\S]*?)\n---\n/, (m, body) => {
+    const kv = body.split("\n").map(l => l.split(/:\s(.*)/s)).filter(x => x[1]);
+    fm = kv.map(([k, v]) => `${esc(k)}: ${esc(v.replace(/^"|"$/g, ""))}`).join(" · ");
+    return "";
+  });
+  text = text.replace(/<!--[\s\S]*?-->/g, "");
+  const lines = text.split("\n");
+  let html = fm ? `<div class="fm">${fm}</div>` : "", i = 0;
+  while (i < lines.length) {
+    let l = lines[i];
+    if (!l.trim()) { i++; continue; }
+    let m;
+    if ((m = l.match(/^(#{1,4})\s+(.*)/))) { const n = m[1].length; html += `<h${n}>${inline(m[2], base)}</h${n}>`; i++; continue; }
+    if (l.startsWith("```")) {
+      const buf = []; i++;
+      while (i < lines.length && !lines[i].startsWith("```")) buf.push(lines[i++]);
+      i++; html += `<pre><code>${esc(buf.join("\n"))}</code></pre>`; continue;
+    }
+    if (l.startsWith("|")) {
+      const rows = [];
+      while (i < lines.length && lines[i].startsWith("|")) rows.push(lines[i++]);
+      const cells = r => r.replace(/^\||\|$/g, "").split("|").map(c => c.trim());
+      const head = cells(rows[0]), align = rows[1] ? cells(rows[1]).map(c => /:$/.test(c)) : [];
+      html += "<table><thead><tr>" + head.map((c, k) => `<th class="${align[k] ? "num" : ""}">${inline(c, base)}</th>`).join("") + "</tr></thead><tbody>";
+      rows.slice(2).forEach(r => html += "<tr>" + cells(r).map((c, k) => `<td class="${align[k] ? "num" : ""}">${inline(c, base)}</td>`).join("") + "</tr>");
+      html += "</tbody></table>"; continue;
+    }
+    if (l.startsWith(">")) {
+      const buf = [];
+      while (i < lines.length && lines[i].startsWith(">")) buf.push(lines[i++].replace(/^>\s?/, ""));
+      html += `<blockquote>${inline(buf.join(" "), base)}</blockquote>`; continue;
+    }
+    if (/^\s*([-*]|\d+\.)\s+/.test(l)) {
+      const ordered = /^\s*\d+\./.test(l), items = [];
+      while (i < lines.length && /^\s*([-*]|\d+\.)\s+/.test(lines[i])) {
+        let item = lines[i++].replace(/^\s*([-*]|\d+\.)\s+/, "");
+        while (i < lines.length && /^\s{2,}\S/.test(lines[i]) && !/^\s*([-*]|\d+\.)\s+/.test(lines[i])) item += " " + lines[i++].trim();
+        items.push(`<li>${inline(item, base)}</li>`);
+      }
+      html += ordered ? `<ol>${items.join("")}</ol>` : `<ul>${items.join("")}</ul>`; continue;
+    }
+    const buf = [];
+    while (i < lines.length && lines[i].trim() && !/^(#{1,4}\s|\||>|```|\s*([-*]|\d+\.)\s+)/.test(lines[i])) buf.push(lines[i++]);
+    html += `<p>${inline(buf.join(" "), base)}</p>`;
+  }
+  return html;
+}
+
+/* ------------------------------------------------------------------ charts (inline SVG) */
+let tipEl = null;
+function tip(container, html, x, y) {
+  if (!tipEl || tipEl.parentNode !== container) { tipEl = document.createElement("div"); tipEl.className = "tip"; container.appendChild(tipEl); }
+  if (html == null) { tipEl.style.display = "none"; return; }
+  tipEl.innerHTML = html; tipEl.style.display = "block";
+  const w = tipEl.offsetWidth, cw = container.clientWidth;
+  tipEl.style.left = Math.max(0, Math.min(cw - w, x + 12)) + "px";
+  tipEl.style.top = Math.max(0, y - 10) + "px";
+}
+function niceMax(v) { if (v <= 4) return Math.max(1, v); const p = Math.pow(10, Math.floor(Math.log10(v))); for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= v) return m * p; return v; }
+
+/* series: [{name, color, values}] ; labels: x labels ; opts: {height, bars, partialFrom, inProgressLast, labelFmt} */
+function chart(container, labels, series, opts = {}) {
+  container.innerHTML = "";
+  container.classList.add("chart");
+  const W = container.clientWidth || 600, H = opts.height || 180;
+  const m = {l: 30, r: 8, t: 8, b: 22};
+  const iw = W - m.l - m.r, ih = H - m.t - m.b, n = labels.length;
+  const maxV = niceMax(Math.max(1, ...series.flatMap(s => s.values)));
+  const x = i => m.l + (n === 1 ? iw / 2 : (opts.bars ? (i + 0.5) * iw / n : i * iw / (n - 1)));
+  const y = v => m.t + ih - (v / maxV) * ih;
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("width", W); svg.setAttribute("height", H);
+  let s = "";
+  // band for periods before monitoring
+  if (opts.partialTo != null && opts.partialTo >= 0) {
+    const x1 = opts.bars ? m.l + (opts.partialTo + 1) * iw / n : x(opts.partialTo) + iw / Math.max(1, n - 1) / 2;
+    s += `<rect x="${m.l}" y="${m.t}" width="${Math.max(0, x1 - m.l)}" height="${ih}" fill="var(--band)"/>`;
+    if (x1 - m.l > 90) s += `<text x="${m.l + 6}" y="${m.t + 13}" font-size="11" fill="var(--text-muted)">${IDX.reconstructed_from ? "reconstructed" : "before monitoring"}</text>`;
+  }
+  // grid + y labels
+  for (const f of [0, 0.5, 1]) {
+    const v = maxV * f, yy = y(v);
+    s += `<line x1="${m.l}" x2="${W - m.r}" y1="${yy}" y2="${yy}" stroke="var(--grid)" stroke-width="1"/>`;
+    s += `<text x="${m.l - 6}" y="${yy + 4}" font-size="11" text-anchor="end" fill="var(--text-muted)">${Number.isInteger(v) ? v : v.toFixed(1)}</text>`;
+  }
+  // x labels: first, middle, last
+  const lf = opts.labelFmt || (l => l);
+  [0, Math.floor((n - 1) / 2), n - 1].filter((v, k, a) => a.indexOf(v) === k).forEach(i =>
+    s += `<text x="${x(i)}" y="${H - 6}" font-size="11" text-anchor="${i === 0 ? "start" : i === n - 1 ? "end" : "middle"}" fill="var(--text-muted)">${esc(lf(labels[i]))}</text>`);
+  if (opts.bars) {
+    const bw = Math.max(1, iw / n - 2);
+    series[0].values.forEach((v, i) => {
+      if (!v) return;
+      const yy = y(v), h = m.t + ih - yy, r = Math.min(4, bw / 2, h);
+      const xx = x(i) - bw / 2;
+      const last = opts.inProgressLast && i === n - 1;
+      s += `<path d="M${xx},${m.t + ih} V${yy + r} Q${xx},${yy} ${xx + r},${yy} H${xx + bw - r} Q${xx + bw},${yy} ${xx + bw},${yy + r} V${m.t + ih} Z" fill="${last ? "var(--series-1-soft)" : series[0].color}"/>`;
+    });
+  } else {
+    series.forEach(se => {
+      const pts = se.values.map((v, i) => `${x(i)},${y(v)}`).join(" ");
+      s += `<polyline points="${pts}" fill="none" stroke="${se.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    });
+  }
+  s += `<line class="xh" x1="0" x2="0" y1="${m.t}" y2="${m.t + ih}" stroke="var(--text-muted)" stroke-width="1" visibility="hidden"/>`;
+  s += `<g class="dots"></g>`;
+  svg.innerHTML = s;
+  container.appendChild(svg);
+  const xh = svg.querySelector(".xh"), dots = svg.querySelector(".dots");
+  svg.addEventListener("mousemove", ev => {
+    const r = svg.getBoundingClientRect(), mx = ev.clientX - r.left;
+    let i = opts.bars ? Math.floor((mx - m.l) / (iw / n)) : Math.round((mx - m.l) / (iw / Math.max(1, n - 1)));
+    i = Math.max(0, Math.min(n - 1, i));
+    xh.setAttribute("x1", x(i)); xh.setAttribute("x2", x(i)); xh.setAttribute("visibility", "visible");
+    dots.innerHTML = opts.bars ? "" : series.map(se => `<circle cx="${x(i)}" cy="${y(se.values[i])}" r="4" fill="${se.color}" stroke="var(--surface-1)" stroke-width="2"/>`).join("");
+    const head = `<b>${esc((opts.tipFmt || lf)(labels[i]))}</b>` + (opts.inProgressLast && i === n - 1 ? ' <span class="muted">(in progress)</span>' : "")
+      + (opts.partialTo != null && i <= opts.partialTo ? ` <span class="muted">(${IDX.reconstructed_from ? "reconstructed" : "before monitoring"})</span>` : "");
+    tip(container, head + "<br>" + series.map(se => (series.length > 1 ? `<i style="display:inline-block;width:10px;height:3px;background:${se.color};vertical-align:middle;margin-right:5px"></i>${esc(se.name)}: ` : "") + `${se.values[i]} ${se.values[i] === 1 ? "story" : "stories"}`).join("<br>"), x(i), m.t);
+  });
+  svg.addEventListener("mouseleave", () => { xh.setAttribute("visibility", "hidden"); dots.innerHTML = ""; tip(container, null); });
+  if (opts.onClick) svg.addEventListener("click", ev => {
+    const r = svg.getBoundingClientRect(), mx = ev.clientX - r.left;
+    let i = opts.bars ? Math.floor((mx - m.l) / (iw / n)) : Math.round((mx - m.l) / (iw / Math.max(1, n - 1)));
+    opts.onClick(labels[Math.max(0, Math.min(n - 1, i))]);
+  });
+}
+function spark(values, w = 120, h = 24, partialTo = -1) {
+  const n = values.length, max = Math.max(1, ...values);
+  const x = i => 1 + i * (w - 2) / Math.max(1, n - 1), y = v => h - 2 - v / max * (h - 4);
+  const band = partialTo >= 0 ? `<rect x="0" y="0" width="${x(partialTo)}" height="${h}" fill="var(--band)"/>` : "";
+  return `<svg class="spark" width="${w}" height="${h}">${band}<polyline points="${values.map((v, i) => `${x(i)},${y(v)}`).join(" ")}" fill="none" stroke="var(--series-1)" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+}
+
+/* ------------------------------------------------------------------ views */
+const app = () => $("#app");
+const STATE = {day: {lens: "all", domain: "", tier: "", q: "", entity: "", shown: 60}, gran: "w", sort: {k: "chg", dir: -1}, type: "", eq: "", compare: []};
+
+async function viewDay(arg) {
+  const days = IDX.days;
+  if (!days.length) { app().innerHTML = "<p>No stories yet.</p>"; return; }
+  const date = arg && days.some(d => d.date === arg) ? arg : days[0].date;
+  const di = days.findIndex(d => d.date === date), meta = days[di];
+  const data = await loadDay(date);
+  const st = STATE.day;
+  const prev = days[di + 1], next = days[di - 1];
+  app().innerHTML = `
+    <div class="row" style="justify-content:space-between;align-items:flex-end">
+      <div><h2>${fmtDate(date)}</h2>
+        <p class="sub">${data.total || data.stories.length} stories${data.arxiv_total > data.arxiv_shown ? ` · ${data.stories.length} listed, including ${data.arxiv_shown} of ${data.arxiv_total} arXiv papers (those with upvotes, wider coverage or watch-term matches)` : ""}${meta.data ? ` · <a href="#report=daily/${date}-data">data report</a>` : ""}</p></div>
+      <div class="row">
+        <button class="btn" id="prev" ${prev ? "" : "disabled"}>← ${prev ? fmtShort(prev.date) : ""}</button>
+        <input type="date" id="pick" value="${date}" min="${days[days.length - 1].date}" max="${days[0].date}">
+        <button class="btn" id="next" ${next ? "" : "disabled"}>${next ? fmtShort(next.date) : ""} →</button>
+      </div>
+    </div>
+    ${meta.recon ? `<div class="note">This day is in the reconstructed period: arXiv papers, Hugging Face Daily Papers, Hacker News stories and GitHub releases were collected afterwards from their archives. Vendor, news and standards sources are incomplete before ${fmtDate(IDX.monitoring_started)}.</div>` : ""}
+    ${meta.partial ? `<div class="note">This day is before monitoring started (${fmtDate(IDX.monitoring_started)}). It holds only what the first collection picked up from feed back-catalogues, so it is incomplete.</div>` : ""}
+    ${data.brief ? `<details class="brief panel" open><summary>Brief for the day</summary><div class="md">${md(data.brief, "reports/daily/")}</div></details>` : ""}
+    <div class="filters row">
+      <input type="search" id="q" placeholder="${PUBLIC() ? "Search titles" : "Search titles and summaries"}" value="${esc(st.q)}">
+      <div class="seg" id="lens">${["all", ...Object.keys(IDX.lenses)].map(l => `<button data-v="${l}" class="${st.lens === l ? "on" : ""}" title="${esc(IDX.lenses[l] || "All stories, ranked by best lens score")}">${l === "all" ? "All" : l[0].toUpperCase() + l.slice(1)}</button>`).join("")}</div>
+      <select id="dom"><option value="">All domains</option>${Object.entries(IDX.domains).map(([k, v]) => `<option value="${k}" ${st.domain === k ? "selected" : ""}>${esc(v)}</option>`).join("")}</select>
+      <select id="tier"><option value="">All source types</option>${Object.entries(TIERS).map(([k, v]) => `<option value="${k}" ${st.tier === k ? "selected" : ""}>${v}</option>`).join("")}</select>
+      <span class="muted small" id="count"></span>
+    </div>
+    <div class="daygrid">
+      <div id="list"></div>
+      <aside class="side"><h3>Entities this day</h3><ol id="ents"></ol></aside>
+    </div>`;
+  $("#prev").onclick = () => prev && (location.hash = "day=" + prev.date);
+  $("#next").onclick = () => next && (location.hash = "day=" + next.date);
+  $("#pick").onchange = e => { const v = e.target.value; const d = days.find(x => x.date <= v) || days[days.length - 1]; location.hash = "day=" + d.date; };
+  $("#q").oninput = e => { st.q = e.target.value; st.shown = 60; renderList(); };
+  $("#lens").onclick = e => { const b = e.target.closest("button"); if (!b) return; st.lens = b.dataset.v; st.shown = 60; $("#lens").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); renderList(); };
+  $("#dom").onchange = e => { st.domain = e.target.value; st.shown = 60; renderList(); };
+  $("#tier").onchange = e => { st.tier = e.target.value; st.shown = 60; renderList(); };
+
+  function filtered() {
+    const q = st.q.trim().toLowerCase();
+    let ss = data.stories.filter(s =>
+      (!st.domain || s.dom.includes(st.domain)) && (!st.tier || s.ti.includes(st.tier)) &&
+      (!st.entity || s.ent.includes(st.entity)) &&
+      (!q || (s.t + " " + s.sum + " " + (s.li || "")).toLowerCase().includes(q)));
+    if (st.lens !== "all") ss = ss.filter(s => (s.ls[st.lens] || 0) >= 1).sort((a, b) => (b.ls[st.lens] || 0) - (a.ls[st.lens] || 0));
+    return ss;
+  }
+  function storyHtml(s) {
+    const sig = [];
+    if (s.pts) sig.push(`HN ${s.pts} points`);
+    if (s.up) sig.push(`HF ${s.up} upvotes`);
+    const meta = [s.p && s.p !== date ? `published ${fmtShort(s.p)}` : "", s.s.join(", "), ...sig].filter(Boolean).join(" · ");
+    const ents = s.ent.filter(e => ENT[e]).map(e => `<a href="#entity=${e}">${esc(ENT[e].name)}</a>`).join(", ");
+    const doms = s.dom.map(d => esc(IDX.domains[d] || d)).join(", ");
+    return `<article class="story">
+      <a class="t" href="${esc(s.u)}" target="_blank" rel="noopener">${esc(s.t)}</a>
+      <div class="meta">${meta}</div>
+      ${s.li ? `<p class="sum">${esc(s.li)}</p>` : s.sum ? `<p class="sum clamp" title="Click to expand">${esc(s.sum)}</p>` : ""}
+      ${doms || ents ? `<div class="tags">${doms ? `Domains: ${doms}` : ""}${doms && ents ? " · " : ""}${ents ? `Entities: ${ents}` : ""}</div>` : ""}
+    </article>`;
+  }
+  function renderList() {
+    const ss = filtered();
+    $("#count").textContent = `${ss.length} shown`;
+    $("#list").innerHTML = ss.slice(0, st.shown).map(storyHtml).join("") +
+      (ss.length > st.shown ? `<div class="more"><button class="btn" id="morebtn">Show ${Math.min(60, ss.length - st.shown)} more of ${ss.length - st.shown}</button></div>` : "") +
+      (!ss.length ? `<p class="muted">No stories match these filters.</p>` : "");
+    const mb = $("#morebtn"); if (mb) mb.onclick = () => { st.shown += 60; renderList(); };
+    $("#list").querySelectorAll(".sum.clamp").forEach(p => p.onclick = () => p.classList.remove("clamp"));
+    const counts = {};
+    data.stories.forEach(s => s.ent.forEach(e => counts[e] = (counts[e] || 0) + 1));
+    const top = Object.entries(counts).filter(([e]) => ENT[e]).sort((a, b) => b[1] - a[1]).slice(0, 30);
+    $("#ents").innerHTML = (st.entity ? `<li><a href="javascript:void 0" data-e="">Clear entity filter</a></li>` : "") +
+      top.map(([e, n]) => `<li><a href="javascript:void 0" data-e="${e}" class="${st.entity === e ? "sel" : ""}" title="Filter stories by ${esc(ENT[e].name)}">${esc(ENT[e].name)}</a><span class="n">${n}</span></li>`).join("");
+    $("#ents").querySelectorAll("a[data-e]").forEach(a => a.onclick = () => { st.entity = st.entity === a.dataset.e ? "" : a.dataset.e; st.shown = 60; renderList(); });
+  }
+  renderList();
+}
+
+function viewArchive() {
+  const byMonth = {};
+  IDX.days.forEach(d => (byMonth[d.date.slice(0, 7)] = byMonth[d.date.slice(0, 7)] || []).push(d));
+  const max = Math.max(1, ...IDX.days.filter(d => !d.partial).map(d => d.n), ...IDX.days.map(d => Math.min(d.n, 300)));
+  app().innerHTML = `<h2>Archive</h2>
+    <p class="sub">Every day with stories, newest first. ${IDX.reconstructed_from ? `Days from ${fmtDate(IDX.reconstructed_from)} to ${fmtDate(prevDay(IDX.monitoring_started))} are reconstructed from archives (arXiv, Hugging Face papers, Hacker News, GitHub releases); vendor and news coverage there is incomplete. ` : ""}${IDX.days.some(d => d.partial) ? "Days marked partial hold only what the first collection found in feed back-catalogues, drawn in a lighter bar." : ""}</p>` +
+    Object.entries(byMonth).map(([mth, ds]) => `<div class="arch-month"><h3>${new Date(mth + "-15").toLocaleDateString("en-GB", {month: "long", year: "numeric"})}</h3>` +
+      ds.map(d => `<div class="arch-row">
+        <a href="#day=${d.date}">${new Date(d.date + "T12:00:00").toLocaleDateString("en-GB", {weekday: "short", day: "numeric", month: "short"})}</a>
+        <div><div class="bar ${d.partial ? "partial" : ""}" style="width:${Math.min(100, d.n / max * 100)}%"></div></div>
+        <span class="n">${d.n}</span>
+        <span class="small">${d.brief ? `<a href="#report=daily/${d.date}">brief</a>` : ""}${d.brief && d.data ? " · " : ""}${d.data ? `<a href="#report=daily/${d.date}-data">data</a>` : ""}${d.partial ? '<span class="muted">partial</span>' : ""}${d.recon ? '<span class="muted">reconstructed</span>' : ""}</span>
+      </div>`).join("") + `</div>`).join("");
+}
+
+function viewReports() {
+  const R = IDX.reports || {};
+  const col = (kind, title) => {
+    const list = (R[kind] || []).slice().reverse();
+    return `<div><h3>${title}</h3><ul>${list.map(r => `<li><a href="#report=${kind}/${r.name}">${esc(r.name)}</a>${PUBLIC() ? "" : ` <span class="muted small">${r.reviewed ? "reviewed" : "data"}</span>`}</li>`).join("") || '<li class="muted">None yet</li>'}</ul></div>`;
+  };
+  app().innerHTML = `<h2>Reports</h2><p class="sub">${PUBLIC() ? "Daily briefs and weekly and monthly reports, written with AI assistance (Anthropic's Claude) from the linked sources." : "Reviewed reports are written by the Claude tasks; data reports by the pipeline."}</p>
+    <div class="reports-cols">${col("weekly", "Weekly")}${col("monthly", "Monthly")}${col("daily", "Daily")}</div>`;
+}
+
+async function viewReport(arg) {
+  try {
+    const r = await loadReport(arg);
+    const base = r.path.replace(/[^/]+$/, "");
+    app().innerHTML = `<p class="small"><a href="#reports">← All reports</a>${PUBLIC() ? "" : ` · <a href="../${esc(r.path)}">open the Markdown file</a>`}</p><div class="md">${md(r.md, base)}</div>`;
+  } catch (e) { app().innerHTML = `<p>Report ${esc(arg)} not found. <a href="#reports">All reports</a></p>`; }
+}
+
+function viewAbout() {
+  const A = IDX.about || {};
+  app().innerHTML = `<h2>How this is made</h2>
+    <div class="md">
+    <p>This page is a monitor of developments across computing, information systems and data science, maintained by ${esc(A.owner || "the site owner")}. It is updated every morning (Singapore time).</p>
+    <h3>Collection</h3>
+    <p>A pipeline collects new items from ${A.n_sources || "about eighty"} public feeds:</p>
+    <ul>${(A.tiers || []).map(t => `<li>${esc(t)}</li>`).join("")}</ul>
+    <p>Items that appear in several sources are merged into one story.</p>
+    <h3>Classification and ranking</h3>
+    <p>Stories are assigned to ${Object.keys(IDX.domains).length} domains, each loosely mapped to the ACM Computing Classification System (2012). Domain assignment uses keyword rules and arXiv categories. Named organisations, technologies, techniques and standards are recognised from a curated list of entities.</p>
+    <p>Rankings are heuristic. They combine the source type, matches against watch terms for teaching, research and industry interest, popularity signals (Hacker News points, Hugging Face upvotes) and coverage by several sources. They decide what to read first; they do not measure importance.</p>
+    <p>Trend counts measure coverage in these sources, not activity in the field. High-volume vendor feeds raise their vendors' counts.</p>
+    <h3>Briefs and reports</h3>
+    <p>The daily briefs and the weekly and monthly reports are written with AI assistance (Anthropic's Claude), from the linked sources. They follow a rule that any claim beyond a source's own summary is checked against the source before it is stated. They may still contain errors; the linked sources are authoritative.</p>
+    <h3>What is not shown</h3>
+    <p>Story summaries from the original publishers are not republished here; follow each title to the source.</p>
+    <p>Live monitoring started on ${fmtDate(IDX.monitoring_started)}.${IDX.reconstructed_from ? ` The period from ${fmtDate(IDX.reconstructed_from)} is reconstructed: arXiv papers, Hugging Face Daily Papers, Hacker News stories above 150 points and GitHub releases were collected afterwards from their archives, while vendor, news and standards sources hold only what their feeds still listed. Reports for reconstructed weeks are marked as retrospective.` : ""} Comparisons between live weeks become meaningful from ${esc(IDX.first_full_week)}.</p>
+    <p>Each day lists every story from vendor, news and standards sources, and the arXiv papers with a signal (Hugging Face upvotes, coverage outside arXiv, or matches with the watch terms), up to ${60} a day. Trend counts include all papers.</p>
+    </div>`;
+}
+
+function periodLabels() { return STATE.gran === "w" ? IDX.week_labels : IDX.day_labels; }
+function partialIdx() {
+  const labels = periodLabels();
+  let k = -1;
+  labels.forEach((l, i) => { if (STATE.gran === "w" ? l < IDX.first_full_week : l < IDX.monitoring_started) k = i; });
+  return k;
+}
+const lblFmt = l => STATE.gran === "w" ? l.replace(/^\d{4}-/, "") : fmtShort(l);
+const tipFmt = l => STATE.gran === "w" ? "Week " + l : fmtDate(l);
+
+function entStats(e) {
+  const v = e[STATE.gran], n = v.length;
+  const cur = v[n - 1], prev = v[n - 2] || 0;
+  const k = STATE.gran === "w" ? 4 : 7;
+  const base = v.slice(Math.max(0, n - 1 - k), n - 1);
+  const mean = base.length ? base.reduce((a, b) => a + b, 0) / base.length : 0;
+  const recent = STATE.gran === "w" ? prev : v.slice(n - 7).reduce((a, b) => a + b, 0);
+  return {cur, prev, mean, chg: (STATE.gran === "w" ? prev : cur) - mean, total: e.total, recent};
+}
+
+function viewTrends() {
+  const pi = partialIdx();
+  const comparing = STATE.compare.filter(id => ENT[id]);
+  app().innerHTML = `<h2>Trends</h2>
+    <p class="sub">How often entities and domains appear in the monitored sources. Counts measure coverage in these sources, not importance; high-volume vendor feeds inflate their vendors' counts.</p>
+    ${pi >= 0 ? (IDX.reconstructed_from
+      ? `<div class="note">Shaded periods are reconstructed from archives: arXiv, Hugging Face papers, Hacker News and GitHub releases are complete there, vendor, news and standards sources are not. Counts rise where live monitoring begins (${fmtDate(IDX.monitoring_started)}) partly because coverage widens; compare within the shaded period, or within the live period, rather than across the boundary.</div>`
+      : `<div class="note">Shaded periods are before monitoring started; their counts come from feed back-catalogues and are not comparable. Week-on-week comparisons become meaningful from ${IDX.first_full_week} onwards, after four full weeks.</div>`) : ""}
+    <div class="row" style="margin:12px 0 18px">
+      <div class="seg" id="gran"><button data-v="w" class="${STATE.gran === "w" ? "on" : ""}">Weekly, ${IDX.week_labels.length} weeks</button><button data-v="d" class="${STATE.gran === "d" ? "on" : ""}">Daily, ${IDX.day_labels.length} days</button></div>
+    </div>
+    <div class="panel compare-box" id="cmp" ${comparing.length ? "" : 'style="display:none"'}>
+      <div class="row" style="justify-content:space-between"><strong>Comparing</strong><span class="row small"><a href="javascript:void 0" id="cmpclear">Clear</a> · <a href="javascript:void 0" id="cmptable">Table view</a></span></div>
+      <div class="legend" id="cmplegend"></div><div id="cmpchart"></div><div id="cmptbl"></div>
+    </div>
+    <h3>Entities</h3>
+    <div class="row" style="margin-bottom:8px">
+      <input type="search" id="eq" placeholder="Find an entity" value="${esc(STATE.eq)}">
+      <select id="etype"><option value="">All types</option>${Object.entries(TYPES).map(([k, v]) => `<option value="${k}" ${STATE.type === k ? "selected" : ""}>${v}</option>`).join("")}</select>
+      <span class="muted small">Tick up to three to compare. ${STATE.gran === "w" ? "Change: last full week against the mean of the four weeks before it." : "Change: today against the mean of the previous seven days."}</span>
+    </div>
+    <div class="panel" style="overflow-x:auto"><table class="ents"><thead><tr>
+      <th style="width:28px"></th><th data-k="name">Entity</th><th data-k="type">Type</th><th>${STATE.gran === "w" ? IDX.week_labels.length + " weeks" : IDX.day_labels.length + " days"}</th>
+      <th class="num" data-k="cur">${STATE.gran === "w" ? "This week" : "Today"}</th><th class="num" data-k="prev">${STATE.gran === "w" ? "Last week" : "Yesterday"}</th>
+      <th class="num" data-k="mean">${STATE.gran === "w" ? "4-week mean" : "7-day mean"}</th><th class="num" data-k="chg">Change</th><th class="num" data-k="total">Total</th>
+    </tr></thead><tbody id="etb"></tbody></table></div>
+    <div class="more" id="emore"></div>
+    <h3>Domains</h3>
+    <p class="sub small">One chart per domain, each on its own scale; hover for counts, click a ${STATE.gran === "w" ? "week" : "day"} to open its stories. The ${STATE.gran === "w" ? "current week" : "current day"} is still in progress and drawn lighter.</p>
+    <div class="multiples" id="mult"></div>`;
+  $("#gran").onclick = e => { const b = e.target.closest("button"); if (!b) return; STATE.gran = b.dataset.v; viewTrends(); };
+  $("#eq").oninput = e => { STATE.eq = e.target.value; STATE.limit = 60; renderTable(); };
+  $("#etype").onchange = e => { STATE.type = e.target.value; STATE.limit = 60; renderTable(); };
+  document.querySelectorAll("table.ents th[data-k]").forEach(th => th.onclick = () => {
+    const k = th.dataset.k; STATE.sort = {k, dir: STATE.sort.k === k ? -STATE.sort.dir : (k === "name" || k === "type" ? 1 : -1)}; renderTable();
+  });
+  STATE.limit = STATE.limit || 60;
+  function renderTable() {
+    const q = STATE.eq.trim().toLowerCase();
+    let rows = IDX.entities.filter(e => (!STATE.type || e.type === STATE.type) && (!q || e.name.toLowerCase().includes(q)))
+      .map(e => ({e, ...entStats(e)}));
+    const {k, dir} = STATE.sort;
+    rows.sort((a, b) => k === "name" ? dir * a.e.name.localeCompare(b.e.name) : k === "type" ? dir * a.e.type.localeCompare(b.e.type) || a.e.name.localeCompare(b.e.name) : dir * ((a[k] - b[k]) || (a.total - b.total)));
+    document.querySelectorAll("table.ents th[data-k]").forEach(th => {
+      const lbl = th.textContent.replace(/[▲▼]\s*$/, "").trim();
+      th.innerHTML = esc(lbl) + (th.dataset.k === k ? ` <span class="arr">${dir > 0 ? "▲" : "▼"}</span>` : "");
+    });
+    $("#etb").innerHTML = rows.slice(0, STATE.limit).map(r => `<tr>
+      <td><input type="checkbox" class="chk" data-id="${r.e.id}" ${STATE.compare.includes(r.e.id) ? "checked" : ""} ${!STATE.compare.includes(r.e.id) && STATE.compare.length >= 3 ? "disabled" : ""} aria-label="Compare ${esc(r.e.name)}"></td>
+      <td><a href="#entity=${r.e.id}">${esc(r.e.name)}</a></td><td class="muted">${TYPE1[r.e.type]}</td>
+      <td>${spark(r.e[STATE.gran], 120, 24, pi)}</td>
+      <td class="num">${r.cur}</td><td class="num">${r.prev}</td><td class="num">${r.mean.toFixed(1)}</td>
+      <td class="num">${r.chg > 0 ? "+" : ""}${r.chg.toFixed(1)}</td><td class="num">${r.total}</td></tr>`).join("");
+    $("#emore").innerHTML = rows.length > STATE.limit ? `<button class="btn" id="emb">Show more (${rows.length - STATE.limit} remaining)</button>` : "";
+    const emb = $("#emb"); if (emb) emb.onclick = () => { STATE.limit += 100; renderTable(); };
+    $("#etb").querySelectorAll(".chk").forEach(c => c.onchange = () => {
+      const id = c.dataset.id;
+      STATE.compare = c.checked ? [...STATE.compare, id].slice(0, 3) : STATE.compare.filter(x => x !== id);
+      renderCompare(); renderTable();
+    });
+  }
+  let showTable = false;
+  function renderCompare() {
+    const ids = STATE.compare.filter(id => ENT[id]);
+    $("#cmp").style.display = ids.length ? "" : "none";
+    if (!ids.length) return;
+    const colors = ["var(--series-1)", "var(--series-2)", "var(--series-3)"];
+    const series = ids.map((id, i) => ({name: ENT[id].name, color: colors[i], values: ENT[id][STATE.gran]}));
+    $("#cmplegend").innerHTML = series.map(s => `<span><i style="background:${s.color}"></i><a href="#entity=${ids[series.indexOf(s)]}">${esc(s.name)}</a></span>`).join("");
+    chart($("#cmpchart"), periodLabels(), series, {height: 220, partialTo: pi, labelFmt: lblFmt, tipFmt});
+    $("#cmptbl").innerHTML = showTable ? `<div class="md" style="overflow-x:auto;max-width:none"><table><thead><tr><th>${STATE.gran === "w" ? "Week" : "Day"}</th>${series.map(s => `<th class="num">${esc(s.name)}</th>`).join("")}</tr></thead><tbody>` +
+      periodLabels().map((l, i) => `<tr><td>${esc(l)}</td>${series.map(s => `<td class="num">${s.values[i]}</td>`).join("")}</tr>`).reverse().join("") + "</tbody></table></div>" : "";
+  }
+  $("#cmpclear").onclick = () => { STATE.compare = []; renderCompare(); renderTable(); };
+  $("#cmptable").onclick = () => { showTable = !showTable; renderCompare(); };
+  renderTable(); renderCompare();
+  const mult = $("#mult");
+  Object.entries(IDX.domains).forEach(([d, label]) => {
+    const v = IDX.domain_series[d][STATE.gran], total = v.reduce((a, b) => a + b, 0);
+    const box = document.createElement("div");
+    box.className = "panel mult";
+    box.innerHTML = `<div class="h">${esc(label)} <span class="muted">· ${total}</span></div><div class="c"></div>`;
+    mult.appendChild(box);
+    chart(box.querySelector(".c"), periodLabels(), [{name: label, color: "var(--series-1)", values: v}],
+      {height: 110, bars: true, partialTo: pi, inProgressLast: true, labelFmt: lblFmt, tipFmt,
+       onClick: l => openPeriod(l, d)});
+  });
+}
+
+function openPeriod(label, domain) {
+  STATE.day.domain = domain || ""; STATE.day.entity = ""; STATE.day.shown = 60;
+  let date = label;
+  if (STATE.gran === "w") {   // most recent day in that ISO week that has stories
+    const [y, w] = label.split("-W").map(Number);
+    const jan4 = new Date(Date.UTC(y, 0, 4)), mon = new Date(jan4); mon.setUTCDate(jan4.getUTCDate() - ((jan4.getUTCDay() + 6) % 7) + (w - 1) * 7);
+    const days = [...Array(7)].map((_, i) => { const d = new Date(mon); d.setUTCDate(mon.getUTCDate() + i); return d.toISOString().slice(0, 10); });
+    const hit = IDX.days.find(x => days.includes(x.date));
+    date = hit ? hit.date : null;
+  }
+  if (date) location.hash = "day=" + date;
+}
+
+const KIND_LABEL = {p: "Papers", r: "Releases", n: "News and blogs"};
+const KIND_ONE = {p: "paper", r: "release", n: "news or blog"};
+const fmtMonth = m => new Date(m + "-15T12:00:00").toLocaleDateString("en-GB", {month: "long", year: "numeric"});
+STATE.ent = {id: null, kind: "all", title: false, allPapers: null, dom: "", q: ""};
+
+async function viewEntity(id) {
+  const e = ENT[id];
+  if (!e) { app().innerHTML = `<p>Entity ${esc(id)} has no stories in the viewer's window. <a href="#trends">Back to trends</a></p>`; return; }
+  if (STATE.ent.id !== id) STATE.ent = {id, kind: "all", title: false, allPapers: null, dom: "", q: ""};
+  const pi = partialIdx(), st = entStats(e);
+  app().innerHTML = `<p class="small"><a href="#trends">← Trends</a></p>
+    <h2>${esc(e.name)}</h2>
+    <p class="sub">${TYPE1[e.type]}${e.domains.length ? " · " + e.domains.map(d => esc(IDX.domains[d] || d)).join(", ") : ""}${PUBLIC() ? "" : ` · <a href="../wiki/entities/${e.id}/index.md">wiki page</a>`}</p>
+    <div class="row" style="margin:6px 0 10px">
+      <div class="seg" id="gran"><button data-v="w" class="${STATE.gran === "w" ? "on" : ""}">Weekly</button><button data-v="d" class="${STATE.gran === "d" ? "on" : ""}">Daily</button></div>
+      <span class="muted small">${STATE.gran === "w" ? `This week ${st.cur}, last week ${st.prev}, four-week mean ${st.mean.toFixed(1)}` : `Today ${st.cur}, seven-day mean ${st.mean.toFixed(1)}`}. Click a bar to open that ${STATE.gran === "w" ? "week" : "day"}.</span>
+    </div>
+    <div class="panel" style="padding:12px 14px"><div id="echart"></div></div>
+    <div id="ereports"></div>
+    <h3>All stories</h3><div id="ebody"><p class="muted">Loading…</p></div>`;
+  $("#gran").onclick = ev => { const b = ev.target.closest("button"); if (!b) return; STATE.gran = b.dataset.v; viewEntity(id); };
+  chart($("#echart"), periodLabels(), [{name: e.name, color: "var(--series-1)", values: e[STATE.gran]}],
+    {height: 200, bars: true, partialTo: pi, inProgressLast: true, labelFmt: lblFmt, tipFmt,
+     onClick: l => { STATE.day.entity = id; openPeriod(l, ""); STATE.day.entity = id; }});
+  let data;
+  try { data = await loadEntity(id); }
+  catch (err) {   // older build without entity files: fall back to the recent list
+    data = {stories: e.recent.map(r => ({t: r.t, u: r.u, d: r.d, s: r.s, k: "n", dom: []})), reports: []};
+  }
+  if (location.hash.slice(1) !== "entity=" + id && decodeURIComponent(location.hash.slice(1)) !== "entity=" + id) return;
+  const reps = data.reports || [];
+  if (reps.length) {
+    const show = reps.slice(0, 12);
+    $("#ereports").innerHTML = `<h3>Reports that discuss ${esc(e.name)}</h3><ul class="reports-list">${show.map(r =>
+      `<li><a href="#report=${esc(r.r)}">${esc(r.title)}</a>${r.data ? ' <span class="muted small">(data report)</span>' : ""}</li>`).join("")}</ul>
+      ${reps.length > show.length ? `<p class="muted small">and ${reps.length - show.length} earlier reports, listed under <a href="#reports">Reports</a>.</p>` : ""}`;
+  }
+  renderEntityStories(e, data.stories);
+}
+
+function renderEntityStories(e, all) {
+  const F = STATE.ent;
+  const nPaperMention = all.filter(s => s.k === "p" && !s.it).length;
+  if (F.allPapers === null) F.allPapers = all.length <= 300;   // large entities start with abstract-only papers hidden
+  const counts = {all: all.length, p: 0, r: 0, n: 0};
+  all.forEach(s => counts[s.k]++);
+  const doms = [...new Set(all.flatMap(s => s.dom || []))].sort((a, b) => (IDX.domains[a] || a).localeCompare(IDX.domains[b] || b));
+  const q = F.q.trim().toLowerCase();
+  const vis = all.filter(s => (F.kind === "all" || s.k === F.kind)
+    && (!F.title || s.it)
+    && (F.title || F.allPapers || s.k !== "p" || s.it)
+    && (!F.dom || (s.dom || []).includes(F.dom))
+    && (!q || s.t.toLowerCase().includes(q)));
+  const hiddenPapers = (!F.title && !F.allPapers && (F.kind === "all" || F.kind === "p")) ? nPaperMention : 0;
+  const months = [];
+  vis.forEach(s => { const m = s.d.slice(0, 7); if (!months.length || months[months.length - 1].m !== m) months.push({m, ss: []}); months[months.length - 1].ss.push(s); });
+  const live = IDX.monitoring_started, recon = IDX.reconstructed_from;
+  $("#ebody").innerHTML = `
+    <div class="ehead">
+      <div class="seg" id="ekind">${["all", "p", "r", "n"].map(k => `<button data-v="${k}" class="${F.kind === k ? "on" : ""}">${k === "all" ? "All" : KIND_LABEL[k]} <span class="muted">${counts[k]}</span></button>`).join("")}</div>
+      <label><input type="checkbox" id="etitle" ${F.title ? "checked" : ""}> Named in the title</label>
+      <select id="edom"><option value="">All domains</option>${doms.map(d => `<option value="${d}" ${F.dom === d ? "selected" : ""}>${esc(IDX.domains[d] || d)}</option>`).join("")}</select>
+      <input type="search" id="eq" placeholder="Search titles" value="${esc(F.q)}">
+    </div>
+    <p class="muted small">Showing ${vis.length} of ${all.length} stories, newest first.${hiddenPapers ? ` ${hiddenPapers} papers that mention ${esc(e.name)} only in the abstract are hidden; <a href="#" id="eallp">show them</a>.` : ""}${F.allPapers && nPaperMention && all.length > 300 && !F.title ? ` <a href="#" id="eallp">Hide papers that mention it only in the abstract</a>.` : ""}</p>
+    <div id="emonths">${months.map((g, i) => {
+      const rc = recon && g.m < live.slice(0, 7) ? " · reconstructed" : (recon && g.m === live.slice(0, 7) && g.ss.some(s => s.d < live) ? " · partly reconstructed" : "");
+      return `<details class="month" data-i="${i}" ${i === 0 ? "open" : ""}><summary>${fmtMonth(g.m)} <span class="muted">${g.ss.length} ${g.ss.length === 1 ? "story" : "stories"}${rc}</span></summary><div class="mbody"></div></details>`;
+    }).join("") || '<p class="muted">No stories match these filters.</p>'}</div>`;
+  const fill = det => {
+    const body = det.querySelector(".mbody");
+    if (body.dataset.done) return;
+    body.dataset.done = "1";
+    body.innerHTML = months[+det.dataset.i].ss.map(s => `<article class="story">
+      <a class="t" href="${esc(s.u)}" target="_blank" rel="noopener">${esc(s.t)}</a>
+      <div class="meta"><a href="#day=${s.d}">${fmtShort(s.d)}</a> · ${KIND_ONE[s.k]} · ${esc(s.s.join(", "))}</div></article>`).join("");
+  };
+  document.querySelectorAll("#emonths details").forEach(d => { if (d.open) fill(d); d.addEventListener("toggle", () => d.open && fill(d)); });
+  const redo = () => renderEntityStories(e, all);
+  $("#ekind").onclick = ev => { const b = ev.target.closest("button"); if (!b) return; F.kind = b.dataset.v; redo(); };
+  $("#etitle").onchange = ev => { F.title = ev.target.checked; redo(); };
+  $("#edom").onchange = ev => { F.dom = ev.target.value; redo(); };
+  let tmr;
+  $("#eq").oninput = ev => { clearTimeout(tmr); tmr = setTimeout(() => { F.q = ev.target.value; redo(); const i = $("#eq"); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }, 250); };
+  const ap = $("#eallp");
+  if (ap) ap.onclick = ev => { ev.preventDefault(); F.allPapers = !F.allPapers; redo(); };
+}
+
+/* ------------------------------------------------------------------ router */
+async function route() {
+  const {view, arg} = parseHash();
+  setNav(view);
+  window.scrollTo(0, 0);
+  try {
+    if (view === "day") await viewDay(arg);
+    else if (view === "archive") viewArchive();
+    else if (view === "trends") viewTrends();
+    else if (view === "reports") viewReports();
+    else if (view === "about" && PUBLIC()) viewAbout();
+    else if (view === "report") await viewReport(arg);
+    else if (view === "entity") await viewEntity(arg);
+    else await viewDay(null);
+  } catch (err) {
+    app().innerHTML = `<p>Could not load this view: ${esc(err.message)}</p>`;
+  }
+  if (PUBLIC()) app().insertAdjacentHTML("beforeend", pubNote());
+}
+loadIndex().then(idx => {
+  IDX = idx; window.__v = idx.generated;
+  if (idx.public) document.body.classList.add("public");
+  IDX.entities.forEach(e => ENT[e.id] = e);
+  $("#gen").textContent = "Data updated " + idx.generated.replace("T", " ");
+  window.addEventListener("hashchange", route);
+  let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { const v = parseHash().view; if (v === "trends" || v === "entity") route(); }, 250); });
+  route();
+}).catch(() => {
+  app().innerHTML = "<p>No data yet. Run <code>python -m itscan site</code> in the IT Industry Scanning folder.</p>";
+});
+</script>
+<script>
+/* site.js — behaviour every page needs: the animated header canvas. */
+(function () {
+(function () {
+      var canvas = document.getElementById('net-canvas');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var W, H, pts, active = true;
+
+      // NYP house colours. The red is brightened from #d2202e because a node is
+      // 2px of colour on a dark navy field — the brand red at full saturation
+      // reads as brown at that size.
+      var PALETTE = [
+        { rgb: '255,255,255', a: .5, r: 1.9 },              // white
+        { rgb: '147,197,253', a: .55, r: 2.0 },             // header blue
+        { rgb: '240,58,72', a: 1, r: 3, glow: 9 }           // NYP red
+      ];
+      var RED_SHARE = .3;    // roughly a third of the nodes carry the red
+
+      function resize() {
+        W = canvas.width = canvas.offsetWidth;
+        H = canvas.height = canvas.offsetHeight;
+        pts = [];
+        var n = Math.min(40, Math.floor(W * H / 8000));
+        for (var i = 0; i < n; i++) {
+          var c = Math.random() < RED_SHARE ? 2 : (Math.random() < .45 ? 0 : 1);
+          pts.push({
+            x: Math.random() * W, y: Math.random() * H,
+            vx: (Math.random() - .5) * .4, vy: (Math.random() - .5) * .4,
+            c: PALETTE[c]
+          });
+        }
+      }
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        for (var i = 0; i < pts.length; i++) {
+          var p = pts[i];
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0 || p.x > W) p.vx *= -1;
+          if (p.y < 0 || p.y > H) p.vy *= -1;
+          if (p.c.glow) {
+            var h = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.c.glow);
+            h.addColorStop(0, 'rgba(' + p.c.rgb + ',.5)');
+            h.addColorStop(1, 'rgba(' + p.c.rgb + ',0)');
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.c.glow, 0, Math.PI * 2);
+            ctx.fillStyle = h; ctx.fill();
+          }
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.c.r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(' + p.c.rgb + ',' + p.c.a + ')'; ctx.fill();
+          for (var j = i + 1; j < pts.length; j++) {
+            var q = pts[j], dx = p.x - q.x, dy = p.y - q.y, d = Math.sqrt(dx * dx + dy * dy);
+            if (d < 120) {
+              // each edge fades from one endpoint's colour to the other, so
+              // blue-to-red links carry both rather than picking a winner.
+              // Same-colour pairs skip the gradient — it is per-edge per-frame.
+              var a = (1 - d / 120) * .3, s;
+              if (p.c === q.c) {
+                s = 'rgba(' + p.c.rgb + ',' + a + ')';
+              } else {
+                s = ctx.createLinearGradient(p.x, p.y, q.x, q.y);
+                s.addColorStop(0, 'rgba(' + p.c.rgb + ',' + a + ')');
+                s.addColorStop(1, 'rgba(' + q.c.rgb + ',' + a + ')');
+              }
+              ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
+              ctx.strokeStyle = s; ctx.stroke();
+            }
+          }
+        }
+        if (active) requestAnimationFrame(draw);
+      }
+      resize(); draw();
+      window.addEventListener('resize', resize);
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (e) {
+          active = e[0].isIntersecting;
+          if (active) requestAnimationFrame(draw);
+        }).observe(canvas);
+      }
+    })();
+})();
+
+</script>
+</body>
+</html>

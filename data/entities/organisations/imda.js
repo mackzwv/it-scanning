@@ -1,0 +1,1 @@
+ITSCAN.loaded("entity","organisations/imda",{"id":"organisations/imda","stories":[{"t":"Ask What Your Country Can Do For You: Towards a Public Red Teaming Model","u":"https://arxiv.org/abs/2510.20061","d":"2025-10-23","s":["arxiv_cs_ai","arxiv_cs_cr","arxiv_cs_cy"],"k":"p","dom":["security_privacy","ai_governance","ai_core"]}],"reports":[]});
