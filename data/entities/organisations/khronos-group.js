@@ -1,0 +1,1 @@
+ITSCAN.loaded("entity","organisations/khronos-group",{"id":"organisations/khronos-group","stories":[{"t":"Khronos To Explore New High Level API For Remote Offloading","u":"https://www.phoronix.com/news/Khronos-Remote-Offloading-API","d":"2026-11-13","s":["phoronix"],"k":"n","dom":["os_systems","software_eng"]}],"reports":[]});
